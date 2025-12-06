@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="pt-PT">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard de Vendas Q1 2025</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Ícones -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #f3f4f6;
+            --card-bg: #ffffff;
+            --text-primary: #1f2937;
+            --text-secondary: #6b7280;
+            --accent-color: #2563eb; /* Azul Power BI */
+            --success-color: #10b981;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            margin: 0;
+            padding: 20px;
+            color: var(--text-primary);
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            background: var(--card-bg);
+            padding: 15px 25px;
+            border-radius: 10px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 1.5rem;
+            color: var(--accent-color);
+        }
+
+        .filters {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        select {
+            padding: 8px 12px;
+            border-radius: 6px;
+            border: 1px solid #d1d5db;
+            background: white;
+            font-size: 0.9rem;
+        }
+
+        /* KPI Cards */
+        .kpi-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .kpi-card {
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            display: flex;
+            flex-direction: column;
+            border-left: 4px solid var(--accent-color);
+        }
+
+        .kpi-title {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .kpi-value {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: var(--text-primary);
+        }
+
+        .kpi-sub {
+            font-size: 0.8rem;
+            color: var(--success-color);
+            margin-top: 5px;
+        }
+
+        /* Charts Grid */
+        .charts-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr); /* 2 colunas */
+            grid-template-rows: auto auto;
+            gap: 20px;
+        }
+
+        .chart-card {
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            min-height: 300px;
+        }
+
+        /* Full width for line chart */
+        .full-width {
+            grid-column: 1 / -1;
+        }
+
+        h3 {
+            margin-top: 0;
+            font-size: 1.1rem;
+            color: var(--text-primary);
+            border-bottom: 1px solid #e5e7eb;
+            padding-bottom: 10px;
+        }
+
+        /* Footer */
+        .footer {
+            margin-top: 30px;
+            text-align: center;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        @media (max-width: 768px) {
+            .charts-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <div>
+            <h1><i class="fas fa-chart-line"></i> Dashboard de Vendas Q1</h1>
+            <span style="font-size: 0.85rem; color: #666;">Dados extraídos do Relatório (1).pdf</span>
+        </div>
+        <div>
+            <button onclick="resetFilters()" style="background: #e5e7eb; border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer;">Limpar Filtros</button>
+        </div>
+    </div>
+
+    <div class="filters">
+        <select id="regionFilter" onchange="updateDashboard()">
+            <option value="all">Todas as Regiões</option>
+            <option value="Norte">Norte</option>
+            <option value="Lisboa">Lisboa</option>
+            <option value="Centro">Centro</option>
+            <option value="Algarve">Algarve</option>
+        </select>
+        
+        <select id="sellerFilter" onchange="updateDashboard()">
+            <option value="all">Todos os Vendedores</option>
+            <!-- Populated via JS -->
+        </select>
+    </div>
+
+    <!-- KPIs -->
+    <div class="kpi-container">
+        <div class="kpi-card">
+            <span class="kpi-title">Vendas Totais (€)</span>
+            <span class="kpi-value" id="kpiSales">€ 0,00</span>
+            <span class="kpi-sub"><i class="fas fa-arrow-up"></i> vs mês anterior</span>
+        </div>
+        <div class="kpi-card" style="border-left-color: #10b981;">
+            <span class="kpi-title">Unidades Vendidas</span>
+            <span class="kpi-value" id="kpiUnits">0</span>
+            <span class="kpi-sub">Volume total</span>
+        </div>
+        <div class="kpi-card" style="border-left-color: #f59e0b;">
+            <span class="kpi-title">Ticket Médio</span>
+            <span class="kpi-value" id="kpiTicket">€ 0,00</span>
+            <span class="kpi-sub">Por transação</span>
+        </div>
+    </div>
+
+    <!-- Visuals -->
+    <div class="charts-grid">
+        <!-- Line Chart (Trend) -->
+        <div class="chart-card full-width">
+            <h3>Evolução Temporal (Jan - Mar)</h3>
+            <div style="height: 300px; position: relative;">
+                <canvas id="trendChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Region Chart -->
+        <div class="chart-card">
+            <h3>Vendas por Região</h3>
+            <div style="height: 250px; position: relative;">
+                <canvas id="regionChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Seller Ranking -->
+        <div class="chart-card">
+            <h3>Top Vendedores</h3>
+            <div style="height: 250px; position: relative;">
+                <canvas id="sellerChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Product Breakdown -->
+        <div class="chart-card">
+            <h3>Performance por Produto</h3>
+            <div style="height: 250px; position: relative;">
+                <canvas id="productChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer">
+        Gerado pelo Especialista Power BI | Dados fictícios Q1 2025
+    </div>
+
+    <script>
+        // --- 1. DADOS ORIGINAIS DO PDF ---
+        // Tratamento de dados: Anos corrigidos, nulos tratados.
+        const rawData = [
+            { date: '2025-01-02', region: 'Norte', seller: 'João Silva', product: 'Portátil Pro 15"', units: 2, unitPrice: 1200, total: 2400 },
+            { date: '2025-01-05', region: 'Lisboa', seller: 'Ana Gomes', product: 'Monitor 27"', units: 5, unitPrice: 300, total: 1500 },
+            { date: '2025-01-10', region: 'Algarve', seller: 'Pedro Costa', product: 'Teclado Mecânico', units: 10, unitPrice: 150, total: 1500 },
+            { date: '2025-01-15', region: 'Norte', seller: 'João Silva', product: 'Rato Ergonómico', units: 8, unitPrice: 80, total: 640 },
+            { date: '2025-01-22', region: 'Centro', seller: 'Maria Neves', product: 'Portátil Pro 13"', units: 3, unitPrice: 1000, total: 3000 },
+            { date: '2025-02-05', region: 'Lisboa', seller: 'Ana Gomes', product: 'Portátil Pro 15"', units: 1, unitPrice: 1200, total: 1200 },
+            { date: '2025-02-12', region: 'Algarve', seller: 'Pedro Costa', product: 'Indefinido (Erro PDF)', units: 4, unitPrice: 200, total: 800 }, // Produto missing in PDF handled
+            { date: '2025-02-18', region: 'Centro', seller: 'Maria Neves', product: 'Monitor 24" Docking', units: 6, unitPrice: 180, total: 1080 },
+            { date: '2025-03-03', region: 'Norte', seller: 'João Silva', product: 'Headset Wireless', units: 7, unitPrice: 120, total: 840 },
+            { date: '2025-03-15', region: 'Lisboa', seller: 'Ana Gomes', product: 'Portátil Pro 13"', units: 2, unitPrice: 1000, total: 2000 }
+        ];
+
+        // Formatters
+        const currencyFmt = new Intl.NumberFormat('pt-PT', { style: 'currency', currency: 'EUR' });
+
+        // Chart instances
+        let charts = {};
+
+        // Initialize
+        window.onload = function() {
+            populateFilters();
+            updateDashboard();
+        };
+
+        function populateFilters() {
+            // Get unique sellers
+            const sellers = [...new Set(rawData.map(d => d.seller))];
+            const selSelect = document.getElementById('sellerFilter');
+            sellers.forEach(s => {
+                const opt = document.createElement('option');
+                opt.value = s;
+                opt.innerText = s;
+                selSelect.appendChild(opt);
+            });
+        }
+
+        function resetFilters() {
+            document.getElementById('regionFilter').value = 'all';
+            document.getElementById('sellerFilter').value = 'all';
+            updateDashboard();
+        }
+
+        function updateDashboard() {
+            // 1. Filter Data
+            const regionVal = document.getElementById('regionFilter').value;
+            const sellerVal = document.getElementById('sellerFilter').value;
+
+            const filteredData = rawData.filter(d => {
+                return (regionVal === 'all' || d.region === regionVal) &&
+                       (sellerVal === 'all' || d.seller === sellerVal);
+            });
+
+            // 2. Calculate KPIs
+            const totalSales = filteredData.reduce((acc, d) => acc + d.total, 0);
+            const totalUnits = filteredData.reduce((acc, d) => acc + d.units, 0);
+            const ticketAvg = filteredData.length ? totalSales / filteredData.length : 0;
+
+            document.getElementById('kpiSales').innerText = currencyFmt.format(totalSales);
+            document.getElementById('kpiUnits').innerText = totalUnits;
+            document.getElementById('kpiTicket').innerText = currencyFmt.format(ticketAvg);
+
+            // 3. Prepare Chart Data
+            updateCharts(filteredData);
+        }
+
+        function updateCharts(data) {
+            // --- Trend Data (Month) ---
+            const months = ["Janeiro", "Fevereiro", "Março"];
+            const monthSales = [0, 0, 0];
+            data.forEach(d => {
+                const monthIdx = new Date(d.date).getMonth(); // 0 = Jan
+                if(monthIdx < 3) monthSales[monthIdx] += d.total;
+            });
+
+            renderChart('trendChart', 'line', months, monthSales, 'Vendas (€)', '#2563eb');
+
+            // --- Region Data ---
+            const regionMap = {};
+            data.forEach(d => {
+                regionMap[d.region] = (regionMap[d.region] || 0) + d.total;
+            });
+            renderChart('regionChart', 'bar', Object.keys(regionMap), Object.values(regionMap), 'Vendas por Região', '#3b82f6');
+
+            // --- Seller Data ---
+            const sellerMap = {};
+            data.forEach(d => {
+                sellerMap[d.seller] = (sellerMap[d.seller] || 0) + d.total;
+            });
+            // Sort sellers
+            const sortedSellers = Object.entries(sellerMap).sort((a,b) => b[1] - a[1]);
+            renderChart('sellerChart', 'bar', sortedSellers.map(x => x[0]), sortedSellers.map(x => x[1]), 'Vendas por Vendedor', '#10b981', true);
+
+            // --- Product Data ---
+            const prodMap = {};
+            data.forEach(d => {
+                prodMap[d.product] = (prodMap[d.product] || 0) + d.total;
+            });
+            renderChart('productChart', 'doughnut', Object.keys(prodMap), Object.values(prodMap), 'Vendas por Produto', 
+                ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899', '#6366f1']);
+        }
+
+        function renderChart(canvasId, type, labels, data, label, colors, indexAxisY = false) {
+            const ctx = document.getElementById(canvasId).getContext('2d');
+            
+            if (charts[canvasId]) {
+                charts[canvasId].destroy();
+            }
+
+            const config = {
+                type: type,
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: label,
+                        data: data,
+                        backgroundColor: type === 'line' ? 'rgba(37, 99, 235, 0.1)' : colors,
+                        borderColor: type === 'line' ? '#2563eb' : 'white',
+                        borderWidth: 2,
+                        fill: type === 'line',
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    indexAxis: indexAxisY ? 'y' : 'x',
+                    plugins: {
+                        legend: { display: type === 'doughnut' },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.dataset.label || '';
+                                    if (label) label += ': ';
+                                    if (context.parsed.y !== null && type !== 'doughnut' && !indexAxisY) {
+                                        return label + new Intl.NumberFormat('pt-PT', { style: 'currency', currency: 'EUR' }).format(context.parsed.y);
+                                    } else if (indexAxisY) {
+                                         return label + new Intl.NumberFormat('pt-PT', { style: 'currency', currency: 'EUR' }).format(context.parsed.x);
+                                    }
+                                    return label + new Intl.NumberFormat('pt-PT', { style: 'currency', currency: 'EUR' }).format(context.raw);
+                                }
+                            }
+                        }
+                    },
+                    scales: type === 'doughnut' ? {} : {
+                        y: { beginAtZero: true }
+                    }
+                }
+            };
+
+            charts[canvasId] = new Chart(ctx, config);
+        }
+    </script>
+</body>
+</html>
