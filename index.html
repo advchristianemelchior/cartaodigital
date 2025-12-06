@@ -14,7 +14,7 @@
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&family=Playfair Display:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
 
     <script>
         tailwind.config = {
@@ -42,140 +42,206 @@
     </script>
 
     <style>
-        /* Animações sutis para elegância */
-        .fade-in {
-            animation: fadeIn 0.8s ease-out forwards;
-            opacity: 0;
-            transform: translateY(10px);
-        }
-        
-        .delay-100 { animation-delay: 0.1s; }
-        .delay-200 { animation-delay: 0.2s; }
-        .delay-300 { animation-delay: 0.3s; }
-        .delay-400 { animation-delay: 0.4s; }
+        /* --- ESTILO ESTÁTICO LIQUID GLASS (SEM ANIMAÇÃO) --- */
 
-        @keyframes fadeIn {
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        /* Efeito de vidro sutil */
+        /* Efeito de vidro para painéis */
         .glass-panel {
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(10px);
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 
+                inset 0 0 20px rgba(255, 255, 255, 0.05),
+                0 4px 6px rgba(0, 0, 0, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Reflexo fixo (estático) para dar volume */
+        .glass-panel::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(
+                to bottom right,
+                rgba(255, 255, 255, 0) 0%,
+                rgba(255, 255, 255, 0.05) 40%,
+                rgba(255, 255, 255, 0.2) 50%,
+                rgba(255, 255, 255, 0.05) 60%,
+                rgba(255, 255, 255, 0) 100%
+            );
+            transform: rotate(30deg);
+            pointer-events: none;
+        }
+
+        /* Efeito de Liquid Glass para o container principal */
+        .liquid-background::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.05));
+            backdrop-filter: blur(4px);
+            pointer-events: none;
+            mix-blend-mode: overlay;
+            box-shadow: inset 0 0 60px rgba(255, 255, 255, 0.1);
+            border-radius: inherit;
+        }
+
+        /* Botões com efeito de bolha/líquido (Estático) */
+        .liquid-button {
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.2s ease; /* Apenas interação de toque */
+            box-shadow: 
+                inset 0 2px 4px rgba(255, 255, 255, 0.4),
+                inset 0 -2px 4px rgba(0, 0, 0, 0.2),
+                0 4px 6px rgba(0, 0, 0, 0.2);
             border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .liquid-button:active {
+            transform: scale(0.98); /* Feedback tátil ao clicar */
+        }
+
+        /* Brilho especular fixo no topo do botão */
+        .liquid-button::before {
+            content: '';
+            position: absolute;
+            top: 5%;
+            left: 5%;
+            width: 90%;
+            height: 45%;
+            background: linear-gradient(to bottom, rgba(255, 255, 255, 0.6), rgba(255, 255, 255, 0.1));
+            border-radius: 12px 12px 40% 40% / 40%;
+            filter: blur(3px);
+            opacity: 0.7;
+            pointer-events: none;
+        }
+
+        /* Botões secundários com efeito de vidro (Estático) */
+        .liquid-button-secondary {
+            position: relative;
+            overflow: hidden;
+            transition: background 0.2s ease;
+            box-shadow: inset 0 0 10px rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(5px);
+        }
+
+        .liquid-button-secondary:active {
+            background: rgba(255, 255, 255, 0.15);
         }
     </style>
 </head>
-<body class="bg-gray-100 flex items-center justify-center min-h-screen p-4">
+<body class="bg-gray-900 flex items-center justify-center min-h-screen p-4">
 
-    <!-- Container Principal (Mobile First) -->
-    <main class="w-full max-w-md bg-brand-navy text-white rounded-3xl shadow-2xl overflow-hidden relative border border-brand-navy/50">
+    <!-- Container Principal (Sem Animação) -->
+    <main class="w-full max-w-md bg-brand-navy text-white rounded-3xl shadow-2xl overflow-hidden relative border border-brand-navy/50 liquid-background">
         
-        <!-- Elemento Decorativo de Fundo -->
-        <div class="absolute top-0 right-0 w-64 h-64 bg-brand-silver/10 rounded-full blur-3xl -mr-16 -mt-16 pointer-events-none"></div>
-        <div class="absolute bottom-0 left-0 w-48 h-48 bg-brand-beige/10 rounded-full blur-2xl -ml-10 -mb-10 pointer-events-none"></div>
+        <!-- Padrão de Fundo de Mármore -->
+        <div class="absolute inset-0 z-0 opacity-40 bg-cover bg-center pointer-events-none"
+             style="background-image: url('https://i.postimg.cc/66rwKkb0/48d9423e-a511-4365-a828-29f0a525bb0f.jpg');">
+        </div>
+
+        <!-- Elementos Decorativos de Luz (Estáticos) -->
+        <div class="absolute top-0 right-0 w-64 h-64 bg-brand-silver/10 rounded-full blur-3xl -mr-16 -mt-16 pointer-events-none z-0"></div>
+        <div class="absolute bottom-0 left-0 w-48 h-48 bg-brand-beige/10 rounded-full blur-2xl -ml-10 -mb-10 pointer-events-none z-0"></div>
 
         <!-- Cabeçalho / Identidade -->
         <header class="relative pt-12 pb-6 px-6 text-center z-10 flex flex-col items-center">
             
-            <!-- Logo Area -->
-            <div class="w-32 h-32 mb-4 relative fade-in">
-                <!-- Fallback visual bonito caso a imagem externa falhe, mas usando a URL fornecida -->
-                <div class="w-full h-full rounded-full shadow-lg overflow-hidden border-2 border-brand-silver bg-white">
+            <!-- Foto de Perfil -->
+            <div class="w-36 h-36 mb-5 relative">
+                <div class="w-full h-full rounded-full shadow-xl overflow-hidden border-[3px] border-brand-silver bg-white">
                      <img src="https://i.postimg.cc/gJWPf4W1/068ace14-c4ac-44a6-91e5-afb7873053bf44.jpg" 
                           alt="Foto de Perfil Christiane Melchior" 
-                          class="w-full h-full object-contain object-center transition-transform duration-500 hover:scale-110"
-                          style="transform: scale(1.5);"
-                          onerror="this.style.display='none'; document.getElementById('fallback-logo').style.display='flex';">
-                     
-                     <!-- Fallback em texto (Iniciais) -->
-                     <div id="fallback-logo" style="display:none;" class="w-full h-full bg-brand-navy flex items-center justify-center">
-                        <span class="font-serif text-3xl text-brand-silver">CM</span>
-                     </div>
+                          class="w-full h-full object-contain object-center"
+                          style="transform: scale(1.5);">
                 </div>
             </div>
 
             <!-- Nome e Título -->
-            <h1 class="font-serif text-2xl font-bold tracking-wide text-white mb-1 fade-in delay-100">
+            <h1 class="font-serif text-3xl font-bold tracking-wide text-white mb-2 text-shadow-sm">
                 Christiane Melchior
             </h1>
-            <p class="font-sans text-brand-silver text-sm uppercase tracking-widest mb-2 fade-in delay-100">
+            <p class="font-sans text-brand-silver text-sm uppercase tracking-widest mb-3 font-semibold">
                 Advogada | OAB/AM 20.797
             </p>
-            <div class="h-0.5 w-16 bg-brand-beige/50 mx-auto rounded-full fade-in delay-100"></div>
+            <div class="h-0.5 w-16 bg-brand-beige/50 mx-auto rounded-full mb-4"></div>
         </header>
 
         <!-- Corpo do Cartão -->
         <section class="px-6 pb-8 relative z-10">
             
             <!-- Introdução Curta -->
-            <div class="text-center mb-8 fade-in delay-200">
-                <p class="text-gray-300 font-light text-sm italic leading-relaxed">
-                    Advocacia, Assessoria & Consultoria Jurídica com excelência e comprometimento.
+            <div class="text-center mb-8">
+                <p class="text-gray-200 font-light text-base italic leading-relaxed drop-shadow-sm">
+                    "Advocacia, Assessoria & Consultoria Jurídica com excelência e comprometimento."
                 </p>
             </div>
 
-            <!-- Botões de Ação Principais (CTA) -->
-            <div class="space-y-4 mb-8 fade-in delay-300">
+            <!-- Botões de Ação Principais (CTA - Liquid Style Estático) -->
+            <div class="space-y-4 mb-8">
                 
-                <!-- WhatsApp (Destaque) -->
-                <a href="https://wa.me/+5592995359422?text=Ol%C3%A1%20dra.%20Christiane,%20tenho%20uma%20d%C3%BAvida." target="_blank" class="group relative flex items-center justify-center w-full p-4 rounded-xl bg-gradient-to-r from-gray-100 to-gray-300 text-brand-navy font-bold shadow-lg hover:shadow-xl transition-all transform hover:-translate-y-1">
-                    <div class="absolute left-4 bg-brand-navy text-white w-8 h-8 rounded-full flex items-center justify-center">
+                <!-- WhatsApp (Destaque Líquido) -->
+                <a href="https://wa.me/+5592995359422?text=Ol%C3%A1%20dra.%20Christiane,%20tenho%20uma%20d%C3%BAvida." target="_blank" class="group relative flex items-center justify-center w-full p-4 rounded-xl bg-gradient-to-r from-gray-100 to-gray-300 text-brand-navy font-bold liquid-button">
+                    <div class="absolute left-4 bg-brand-navy text-white w-8 h-8 rounded-full flex items-center justify-center shadow-md z-10">
                         <i class="fab fa-whatsapp text-lg"></i>
                     </div>
-                    <span class="tracking-wide">Iniciar Atendimento</span>
+                    <span class="tracking-wide z-10">Iniciar Atendimento</span>
                 </a>
 
-                <!-- Salvar Contato (vCard) -->
-                <button onclick="downloadVCard()" class="group flex items-center justify-center w-full p-3.5 rounded-xl border border-brand-silver/30 text-white hover:bg-white/5 transition-colors backdrop-blur-sm">
-                    <i class="fas fa-user-plus mr-3 text-brand-silver"></i>
+                <!-- Salvar Contato (vCard - Liquid Secondary) -->
+                <button onclick="downloadVCard()" class="group flex items-center justify-center w-full p-3.5 rounded-xl text-white hover:bg-white/5 transition-colors liquid-button-secondary">
+                    <i class="fas fa-user-plus mr-3 text-brand-silver group-hover:text-white transition-colors"></i>
                     <span>Salvar Contato</span>
                 </button>
 
-                <!-- Grid de Contatos Secundários -->
+                <!-- Grid de Contatos Secundários (Liquid Secondary) -->
                 <div class="grid grid-cols-2 gap-3">
-                    <a href="mailto:advchristianemelchior@gmail.com" class="flex flex-col items-center justify-center p-3 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 transition">
-                        <i class="far fa-envelope text-brand-beige mb-1"></i>
-                        <span class="text-xs text-gray-300">E-mail</span>
+                    <a href="mailto:advchristianemelchior@gmail.com" class="flex flex-col items-center justify-center p-3 rounded-xl bg-white/5 hover:bg-white/10 transition liquid-button-secondary">
+                        <i class="far fa-envelope text-brand-beige mb-1 text-xl"></i>
+                        <span class="text-sm text-gray-200 font-medium">E-mail</span>
                     </a>
-                    <a href="https://maps.google.com/?q=Rua+Praia+Canoa+Quebrada,262,Tarumã,Manaus" target="_blank" class="flex flex-col items-center justify-center p-3 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 transition">
-                        <i class="fas fa-map-marker-alt text-brand-beige mb-1"></i>
-                        <span class="text-xs text-gray-300">Localização</span>
+                    <a href="https://maps.google.com/?q=Rua+Praia+Canoa+Quebrada,262,Tarumã,Manaus" target="_blank" class="flex flex-col items-center justify-center p-3 rounded-xl bg-white/5 hover:bg-white/10 transition liquid-button-secondary">
+                        <i class="fas fa-map-marker-alt text-brand-beige mb-1 text-xl"></i>
+                        <span class="text-sm text-gray-200 font-medium">Localização</span>
                     </a>
                 </div>
             </div>
 
-            <!-- Áreas de Atuação (Design Limpo) -->
-            <div class="glass-panel rounded-2xl p-5 mb-6 fade-in delay-400">
-                <h3 class="font-serif text-brand-beige text-center mb-4 text-lg border-b border-white/10 pb-2">Áreas de Atuação</h3>
-                <div class="flex flex-wrap justify-center gap-2">
-                    <span class="px-3 py-1 bg-brand-navy border border-brand-silver/30 rounded-full text-xs text-gray-200">Cível</span>
-                    <span class="px-3 py-1 bg-brand-navy border border-brand-silver/30 rounded-full text-xs text-gray-200">Comercial</span>
-                    <span class="px-3 py-1 bg-brand-navy border border-brand-silver/30 rounded-full text-xs text-gray-200">Trabalhista</span>
-                    <span class="px-3 py-1 bg-brand-navy border border-brand-silver/30 rounded-full text-xs text-gray-200">Previdenciário</span>
-                    <span class="px-3 py-1 bg-brand-navy border border-brand-silver/30 rounded-full text-xs text-gray-200">Criminal</span>
-                    <span class="px-3 py-1 bg-brand-navy border border-brand-silver/30 rounded-full text-xs text-gray-200">Administrativo</span>
-                    <span class="px-3 py-1 bg-brand-navy border border-brand-silver/30 rounded-full text-xs text-gray-200">Eleitoral</span>
+            <!-- Áreas de Atuação (Glass Panel Estático) -->
+            <div class="glass-panel rounded-2xl p-6 mb-6">
+                <h3 class="font-serif text-brand-beige text-center mb-4 text-xl border-b border-white/10 pb-3 shadow-[0_1px_0_rgba(255,255,255,0.1)]">Áreas de Atuação</h3>
+                <div class="flex flex-wrap justify-center gap-2.5">
+                    <span class="px-4 py-1.5 bg-brand-navy/50 border border-brand-silver/30 rounded-full text-sm text-gray-100 backdrop-blur-md shadow-sm">Cível</span>
+                    <span class="px-4 py-1.5 bg-brand-navy/50 border border-brand-silver/30 rounded-full text-sm text-gray-100 backdrop-blur-md shadow-sm">Comercial</span>
+                    <span class="px-4 py-1.5 bg-brand-navy/50 border border-brand-silver/30 rounded-full text-sm text-gray-100 backdrop-blur-md shadow-sm">Trabalhista</span>
+                    <span class="px-4 py-1.5 bg-brand-navy/50 border border-brand-silver/30 rounded-full text-sm text-gray-100 backdrop-blur-md shadow-sm">Previdenciário</span>
+                    <span class="px-4 py-1.5 bg-brand-navy/50 border border-brand-silver/30 rounded-full text-sm text-gray-100 backdrop-blur-md shadow-sm">Criminal</span>
+                    <span class="px-4 py-1.5 bg-brand-navy/50 border border-brand-silver/30 rounded-full text-sm text-gray-100 backdrop-blur-md shadow-sm">Administrativo</span>
                 </div>
             </div>
 
             <!-- Endereço Footer -->
-            <footer class="text-center text-xs text-gray-400 font-light fade-in delay-400 border-t border-white/5 pt-4">
-                <p class="mb-1">
-                    <i class="fas fa-location-dot mr-1"></i>
+            <footer class="text-center text-sm text-gray-400 font-light border-t border-white/5 pt-6">
+                <p class="mb-1 leading-relaxed">
+                    <i class="fas fa-location-dot mr-1 text-brand-silver"></i>
                     Rua Praia Canoa Quebrada, 262, Tarumã
                 </p>
-                <p class="mb-4">Cond. Jardim Paradiso Alpinia - Manaus/AM</p>
+                <p class="mb-6 leading-relaxed">Cond. Jardim Paradiso Alpinia - Manaus/AM</p>
                 
-                <div class="flex justify-center items-center gap-4 text-brand-silver text-lg">
-                    <a href="https://www.instagram.com/dra.christianemelchior?igsh=MTUyNXhvcjBsOGZtZg%3D%3D&utm_source=qr" target="_blank" class="hover:text-white transition"><i class="fab fa-instagram"></i></a>
-                    <a href="https://www.linkedin.com/in/christiane-maciel-de-lima-melchior-4a7993397?utm_source=share_via&utm_content=profile&utm_medium=member_ios" target="_blank" class="hover:text-white transition"><i class="fab fa-linkedin"></i></a>
+                <div class="flex justify-center items-center gap-6 text-brand-silver text-2xl mb-4">
+                    <a href="https://www.instagram.com/dra.christianemelchior?igsh=MTUyNXhvcjBsOGZtZg%3D%3D&utm_source=qr" target="_blank" class="hover:text-white transition transform active:scale-95 duration-200"><i class="fab fa-instagram"></i></a>
+                    <a href="https://www.linkedin.com/in/christiane-maciel-de-lima-melchior-4a7993397?utm_source=share_via&utm_content=profile&utm_medium=member_ios" target="_blank" class="hover:text-white transition transform active:scale-95 duration-200"><i class="fab fa-linkedin"></i></a>
                 </div>
                 
-                <p class="mt-6 text-[10px] opacity-50">© 2025 Christiane Melchior Advocacia</p>
+                <p class="text-[11px] opacity-50 tracking-wider">© 2025 Christiane Melchior Advocacia</p>
             </footer>
 
         </section>
@@ -211,4 +277,3 @@ END:VCARD`;
     </script>
 </body>
 </html>
-
